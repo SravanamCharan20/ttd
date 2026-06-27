@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 · Select Pilgrims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;background:#ECEFF1;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  ::-webkit-scrollbar{width:0;height:0}
+  input{font-family:inherit}
+  @keyframes pulseOpacity{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div style="width:375px;height:780px;background:#fff;border-radius:18px;border:1px solid #DDE1E6;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(40,20,80,.08)">
+        <div style="background:#4A148C;color:#fff;flex-shrink:0">
+          <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px"><span style="font-weight:600">10:00</span><span style="display:flex;align-items:center;gap:8px"><b style="font-weight:700;font-size:10px">5G</b><span style="display:inline-block;width:20px;height:11px;border:1px solid #fff;border-radius:2px;position:relative"><span style="position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:13px;background:#fff;border-radius:1px"></span></span></span></div>
+          <div style="height:56px;display:flex;align-items:center;gap:16px;padding:0 16px"><span style="font-size:22px;line-height:1">←</span><span style="font-size:17px;font-weight:600">Select Pilgrims</span></div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:16px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;gap:12px">
+            <span style="font-size:18px;font-weight:700;color:#212121">Who's going for Darshan?</span>
+            <span style="font-size:13px;color:#757575;font-weight:600;white-space:nowrap"id="counter">2 of 6 selected</span>
+          </div>
+          <div style="font-size:13px;color:#757575;margin-bottom:16px;line-height:1.45">No typing — tap your saved pilgrims below and they're added in seconds.</div>
+
+          <!-- Selected tray -->
+          
+            <div id="tray" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+              
+                <span style="display:inline-flex;align-items:center;min-height:36px;padding:0 6px 0 14px;border-radius:20px;background:#EDE7F6;border:1.5px solid #673AB7;white-space:nowrap">
+                  <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#673AB7;color:#fff;font-size:11px;margin-right:8px">✓</span>
+                  <span style="font-size:13.5px;color:#4A148C;font-weight:600">Ramesh K.</span>
+                  <button onclick="rm('ramesh')" style="margin-left:6px;width:24px;height:24px;border:none;background:none;color:#7E57C2;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+                </span>
+              
+                <span style="display:inline-flex;align-items:center;min-height:36px;padding:0 6px 0 14px;border-radius:20px;background:#EDE7F6;border:1.5px solid #673AB7;white-space:nowrap">
+                  <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#673AB7;color:#fff;font-size:11px;margin-right:8px">✓</span>
+                  <span style="font-size:13.5px;color:#4A148C;font-weight:600">Suresh B.</span>
+                  <button onclick="rm('suresh')" style="margin-left:6px;width:24px;height:24px;border:none;background:none;color:#7E57C2;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+                </span>
+              
+            </div>
+          
+          
+
+          <div style="height:1px;background:#E0E0E0;margin:4px 0 16px"></div>
+
+          <!-- Roster picker -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;letter-spacing:.04em;color:#9AA0A8;text-transform:uppercase;white-space:nowrap">Your saved pilgrims</span>
+            <span style="font-size:12px;color:#9E9E9E;white-space:nowrap">7 of 12 saved</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+            
+              <button data-pid="ramesh" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:2px solid #673AB7;background:#F6F2FD;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">RK</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Ramesh Kumar</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Aadhaar •••• 4523</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 58 · Male</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#673AB7;border:2px solid #673AB7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="color:#fff;font-size:13px">✓</span></span>
+                
+              </button>
+            
+              <button data-pid="lakshmi" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:1px solid #E0E0E0;background:#F7F7F8;cursor:not-allowed;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#ECECEF;color:#9E9E9E">LD</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Lakshmi Devi</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Aadhaar •••• 8891</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 54 · Female</span>
+                </span>
+                
+                  <span style="display:inline-flex;align-items:center;gap:6px;flex-shrink:0">
+                    <span style="font-size:11px;font-weight:700;color:#E64A19;background:#FFF0E8;padding:3px 8px;border-radius:12px;white-space:nowrap">Booked</span>
+                    <span style="color:#9E9E9E;font-size:16px;display:inline-flex">ⓘ</span>
+                  </span>
+                
+                
+              </button>
+            
+              <button data-pid="suresh" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:2px solid #673AB7;background:#F6F2FD;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">SB</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Suresh Babu</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Voter ID •••• 2210</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 32 · Male</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#673AB7;border:2px solid #673AB7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="color:#fff;font-size:13px">✓</span></span>
+                
+              </button>
+            
+              <button data-pid="anjali" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:1px solid #E0E0E0;background:#fff;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">AR</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Anjali Reddy</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Passport •••• 7891</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 27 · Female</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid #C9C9CF;display:flex;align-items:center;justify-content:center;flex-shrink:0"></span>
+                
+              </button>
+            
+              <button data-pid="venkat" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:1px solid #E0E0E0;background:#fff;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">VR</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Venkat Rao</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Aadhaar •••• 3360</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 61 · Male</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid #C9C9CF;display:flex;align-items:center;justify-content:center;flex-shrink:0"></span>
+                
+              </button>
+            
+              <button data-pid="padma" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:1px solid #E0E0E0;background:#fff;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">PN</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Padmavathi N.</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">Aadhaar •••• 1147</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 49 · Female</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid #C9C9CF;display:flex;align-items:center;justify-content:center;flex-shrink:0"></span>
+                
+              </button>
+            
+              <button data-pid="kiran" onclick="tgl(this)" style="display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;border:1px solid #E0E0E0;background:#fff;cursor:pointer;">
+                <span style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;background:#EDE7F6;color:#673AB7">KK</span>
+                <span style="flex:1;min-width:0;text-align:left">
+                  <span style="display:block;font-size:15px;font-weight:600;color:#212121">Kiran Kumar</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:2px">PAN •••• 9F2K</span>
+                  <span style="display:block;font-size:12.5px;color:#757575;margin-top:1px">Age 24 · Male</span>
+                </span>
+                
+                
+                  <span data-circle style="width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid #C9C9CF;display:flex;align-items:center;justify-content:center;flex-shrink:0"></span>
+                
+              </button>
+            
+          </div>
+
+          <button style="display:flex;align-items:center;gap:10px;width:100%;background:#fff;border:1.5px dashed #C2B6D8;border-radius:12px;padding:14px 16px;cursor:pointer;margin-bottom:8px">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#EDE7F6;color:#673AB7;font-size:20px;flex-shrink:0">+</span>
+            <span style="text-align:left"><span style="display:block;font-size:14px;font-weight:700;color:#673AB7">Add a pilgrim not in this list</span><span style="display:block;font-size:12px;color:#9E9E9E;margin-top:1px">Save their details once, reuse every release</span></span>
+          </button>
+          <div style="font-size:12px;color:#9E9E9E;margin-bottom:20px">Maximum 6 pilgrims per booking</div>
+
+          <div style="height:1px;background:#E0E0E0;margin:4px 0 16px"></div>
+
+          <!-- Add-ons -->
+          <div style="font-size:15px;font-weight:700;color:#212121;margin-bottom:12px">Add-ons</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div><div style="font-size:14.5px;color:#212121;font-weight:500">Laddu Prasadam</div><div style="font-size:12px;color:#9E9E9E;margin-top:4px">₹25 each</div></div>
+            <div style="display:flex;align-items:center;gap:0;border:1px solid #D7D7DD;border-radius:9px;overflow:hidden">
+              <button onclick="laddu(-1)" style="width:38px;height:38px;background:#F7F7F9;border:none;font-size:20px;color:#673AB7;cursor:pointer">–</button>
+              <div style="width:42px;text-align:center;font-size:16px;font-weight:700;color:#212121"id="ladduN">2</div>
+              <button onclick="laddu(1)" style="width:38px;height:38px;background:#F7F7F9;border:none;font-size:20px;color:#673AB7;cursor:pointer">+</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div><div style="font-size:14.5px;color:#212121;font-weight:500">Hundi Offering</div><div style="font-size:12px;color:#9E9E9E;margin-top:4px">Receivable only in ₹</div></div>
+            <div style="width:110px;height:42px;border:1px solid #CFCFD6;border-radius:8px;display:flex;align-items:center;padding:0 12px;font-size:15px;color:#212121"><span style="color:#9E9E9E;margin-right:4px">₹</span>100</div>
+          </div>
+
+          <div style="height:1px;background:#E0E0E0;margin:20px 0 16px"></div>
+
+          <!-- Declaration -->
+          <div style="background:#FFF0E8;border-radius:12px;padding:16px 16px">
+            <div style="font-size:13.5px;font-weight:700;color:#B23A00;margin-bottom:8px">Important</div>
+            <div style="font-size:12.5px;color:#7A4a2e;line-height:1.6">
+              1. All pilgrims must carry the original Photo ID used during booking.<br>
+              2. Children below 12 enter free with age proof.<br>
+              3. All bookings are FINAL — no postponement, cancellation, or refund.<br>
+              4. Read full instructions at ttdevasthanams.ap.gov.in
+            </div>
+          </div>
+          <button onclick="tgAgree()" style="display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;padding:16px 4px 4px;text-align:left;width:100%">
+            <span id="agreeBox" style="width:22px;height:22px;border-radius:6px;background:#fff;border:1.5px solid #BDBDBD;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="color:#fff;font-size:14px">✓</span></span>
+            <span style="font-size:14px;color:#212121">I have read and agree to the above terms</span>
+          </button>
+        </div>
+        <div style="flex-shrink:0;display:flex;gap:12px;padding:16px 16px;border-top:1px solid #EEE;background:#fff">
+          <button style="flex:1;height:48px;border:1px solid #673AB7;border-radius:8px;background:#fff;color:#673AB7;font-size:16px;font-weight:700;cursor:pointer">Back</button>
+          <button id="continueBtn" style="flex:1;height:48px;border:none;border-radius:8px;background:#E4E4E8;color:#A8A8AE;font-size:16px;font-weight:700;cursor:not-allowed">Continue to Queue</button>
+        </div>
+      </div>
+<script>
+const SHORT={"ramesh":"Ramesh K.","lakshmi":"Lakshmi D.","suresh":"Suresh B.","anjali":"Anjali R.","venkat":"Venkat R.","padma":"Padma N.","kiran":"Kiran K."};
+let sel=new Set(['ramesh','suresh']); let agree=false;
+const rowBase='display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 14px;border-radius:12px;text-align:left;cursor:pointer;';
+function styleRow(btn,on){ btn.setAttribute('style', rowBase+(on?'border:2px solid #673AB7;background:#F6F2FD;':'border:1px solid #E0E0E0;background:#fff;')); }
+function circle(c,on){ c.setAttribute('style', on?'width:24px;height:24px;border-radius:50%;background:#673AB7;border:2px solid #673AB7;display:flex;align-items:center;justify-content:center;flex-shrink:0':'width:24px;height:24px;border-radius:50%;background:#fff;border:1.5px solid #C9C9CF;display:flex;align-items:center;justify-content:center;flex-shrink:0'); c.innerHTML=on?'<span style="color:#fff;font-size:13px">✓</span>':''; }
+function tgl(btn){ const id=btn.dataset.pid; if(sel.has(id)) sel.delete(id); else { if(sel.size>=6) return; sel.add(id);} const on=sel.has(id); styleRow(btn,on); const c=btn.querySelector('[data-circle]'); if(c) circle(c,on); refresh(); }
+function rm(id){ sel.delete(id); const btn=document.querySelector('[data-pid="'+id+'"]'); if(btn){ styleRow(btn,false); const c=btn.querySelector('[data-circle]'); if(c) circle(c,false);} refresh(); }
+function pill(id){ return '<span style="display:inline-flex;align-items:center;min-height:36px;padding:0 6px 0 14px;border-radius:20px;background:#EDE7F6;border:1.5px solid #673AB7;white-space:nowrap"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#673AB7;color:#fff;font-size:11px;margin-right:8px">✓</span><span style="font-size:13.5px;color:#4A148C;font-weight:600">'+SHORT[id]+'</span><button onclick="rm(\''+id+'\')" style="margin-left:6px;width:24px;height:24px;border:none;background:none;color:#7E57C2;font-size:17px;cursor:pointer;line-height:1">×</button></span>'; }
+function refresh(){ document.getElementById('counter').textContent=sel.size+' of 6 selected'; const tray=document.getElementById('tray'); tray.innerHTML=[...sel].map(pill).join(''); tray.style.display=sel.size?'flex':'none'; const ok=sel.size>=1&&agree; document.getElementById('continueBtn').setAttribute('style','flex:1;height:48px;border:none;border-radius:8px;font-size:16px;font-weight:700;'+(ok?'background:#673AB7;color:#fff;cursor:pointer':'background:#E4E4E8;color:#A8A8AE;cursor:not-allowed')); }
+function laddu(d){ const el=document.getElementById('ladduN'); let v=Math.max(0,Math.min(10,parseInt(el.textContent)+d)); el.textContent=v; }
+function tgAgree(){ agree=!agree; const cb=document.getElementById('agreeBox'); cb.setAttribute('style','width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;'+(agree?'background:#673AB7;border:1px solid #673AB7':'background:#fff;border:1.5px solid #BDBDBD')); cb.innerHTML=agree?'<span style="color:#fff;font-size:14px">✓</span>':''; refresh(); }
+</script>
+</body>
+</html>
