@@ -19,14 +19,18 @@
 <div style="width:375px;height:780px;background:#fff;border-radius:18px;border:1px solid #DDE1E6;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(40,20,80,.08)">
         <div style="background:#4A148C;color:#fff;flex-shrink:0">
           <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px"><span style="font-weight:600">10:00</span><span style="display:flex;align-items:center;gap:8px"><b style="font-weight:700;font-size:10px">5G</b><span style="display:inline-block;width:20px;height:11px;border:1px solid #fff;border-radius:2px;position:relative"><span style="position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:13px;background:#fff;border-radius:1px"></span></span></span></div>
-          <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px"><span style="font-size:17px;font-weight:600">Complete Payment</span><span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.16);border-radius:20px;padding:5px 11px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg><span id="payTimer" style="font-size:13.5px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums">2:47</span></span></div>
+          <div style="height:56px;display:flex;align-items:center;justify-content:center;padding:0 16px"><span style="font-size:17px;font-weight:600">Complete Payment</span></div>
+        </div>
+        <div style="flex-shrink:0;padding:16px 16px 4px">
+          <div style="height:6px;border-radius:4px;background:#E8E4F0;overflow:hidden"><div id="payBar" style="height:100%;width:84%;background:#673AB7;border-radius:4px;transition:width 1s linear"></div></div>
+          <div id="payRemain" style="text-align:right;font-size:14px;font-weight:700;color:#673AB7;margin-top:10px">2:31 remaining</div>
         </div>
         <div style="flex:1;overflow:auto;padding:8px 16px 16px">
           <!-- summary -->
           <div style="border:1px solid #E0E0E0;border-radius:12px;padding:16px;margin-bottom:12px">
             <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">Darshan Date</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap">11 July 2026</span></div>
             <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">Darshan Slot</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:8px">8:00 AM <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#673AB7" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></span></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">No. of Pilgrims</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap">4</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">No. of Pilgrims</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap">1</span></div>
             <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">Laddu Prasadam</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap">2 (₹50)</span></div>
             <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#757575">Hundi Offering</span><span style="font-size:15px;color:#212121;font-weight:700;white-space:nowrap">₹100</span></div>
             <div style="height:1px;background:#E0E0E0;margin-bottom:12px"></div>
@@ -65,8 +69,10 @@ function pick(p){
   document.querySelectorAll('[data-radio]').forEach(r=>{const on=r.dataset.radio===p;
     r.setAttribute('style',on?'width:20px;height:20px;border-radius:50%;border:6px solid #673AB7;flex-shrink:0':'width:20px;height:20px;border-radius:50%;border:1.5px solid #C9C9CF;flex-shrink:0');});
 }
-let s=167;const el=document.getElementById('payTimer');
-setInterval(()=>{ if(s>0)s--; const m=Math.floor(s/60),ss=String(s%60).padStart(2,'0'); el.textContent=m+':'+ss; },1000);
+let s=151; const TOTAL=180;
+const barEl=document.getElementById('payBar');
+const remainEl=document.getElementById('payRemain');
+setInterval(()=>{ if(s>0)s--; const m=Math.floor(s/60),ss=String(s%60).padStart(2,'0'); remainEl.textContent=m+':'+ss+' remaining'; barEl.style.width=(s/TOTAL*100)+'%'; },1000);
 </script>
 </body>
 </html>
