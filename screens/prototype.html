@@ -25,7 +25,7 @@
   .phone{width:360px;height:800px;transform-origin:center center;border-radius:30px;background:#000;box-shadow:0 24px 70px rgba(40,20,80,.28);overflow:hidden;position:relative}
   .viewport{position:absolute;inset:0;overflow:hidden;background:#fff;border-radius:30px}
   .viewport iframe{position:absolute;top:0;left:0;width:360px;height:800px;border:none;display:block;background:#fff;will-change:transform,opacity;backface-visibility:hidden}
-  .scrim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;will-change:opacity}
+  .scrim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;will-change:opacity;z-index:2}
 </style>
 </head>
 <body>
@@ -57,9 +57,11 @@
   var wrap=document.getElementById('stagewrap');
   var nowEl=document.getElementById('now');
   var front=0, busy=false, pending=null;
-  var navStack=['01-services-menu.html'];
-  var EASE='cubic-bezier(.22,.75,.24,1)';
-  var DUR=460;
+  var HOME='01-services-menu.html';
+  var navStack=[HOME];
+
+  // Screens that behave as modals / bottom-sheets (dim + blurred backdrop baked in).
+  var SHEET={'07-confirm-slot-lock.html':1,'18-remove-pilgrim.html':1,'19-constraint-info.html':1,'17-inactivity-prompt.html':1};
 
   var NAMES={
     '01-services-menu.html':'01 · Services','02-my-pilgrims-empty.html':'02 · My Pilgrims','03-my-pilgrims-list.html':'03 · My Pilgrims',
@@ -71,68 +73,103 @@
   };
   function label(dest){ return NAMES[dest] || dest.replace('.html','').replace(/-/g,' '); }
 
-  // park an idle iframe fully off-stage + invisible
+  // ---- transition recipes ---------------------------------------------------
+  // Each recipe: incoming (b) starts at `bFrom`/`bOp` and animates to rest (0,1);
+  // outgoing (f) animates to `fTo`/`fOp`; `topIn` = incoming sits above outgoing.
+  // scrim dims the lower layer (scrimStart -> scrimEnd).
+  var REST='translate3d(0,0,0) scale(1)';
+  var RECIPES={
+    forward:{ bFrom:'translate3d(100%,0,0)', bOp:1, fTo:'translate3d(-22%,0,0)', fOp:1, topIn:true,  scrimStart:0,   scrimEnd:.14, ease:'cubic-bezier(.33,.8,.28,1)', dur:300 },
+    back:   { bFrom:'translate3d(-22%,0,0)', bOp:1, fTo:'translate3d(100%,0,0)', fOp:1, topIn:false, scrimStart:.14, scrimEnd:0,   ease:'cubic-bezier(.33,.8,.28,1)', dur:300 },
+    up:     { bFrom:'translate3d(0,100%,0)', bOp:1, fTo:'translate3d(0,0,0) scale(.98)', fOp:1, topIn:true,  scrimStart:0,   scrimEnd:.22, ease:'cubic-bezier(.32,.72,0,1)',  dur:340 },
+    down:   { bFrom:REST,                    bOp:1, fTo:'translate3d(0,100%,0)', fOp:1, topIn:false, scrimStart:.22, scrimEnd:0,   ease:'cubic-bezier(.32,.72,0,1)',  dur:300 },
+    fade:   { bFrom:'translate3d(0,0,0) scale(1.02)', bOp:0, fTo:'translate3d(0,0,0) scale(.99)', fOp:0, topIn:true, scrimStart:0, scrimEnd:0, ease:'cubic-bezier(.4,0,.2,1)', dur:240 }
+  };
+
   function park(el){ el.style.transition='none'; el.style.opacity='0'; el.style.transform='translate3d(100%,0,0)'; }
-  // init front
-  frames[0].style.transform='translate3d(0,0,0)'; frames[0].style.opacity='1'; frames[0].style.zIndex='2';
+  frames[0].style.transform=REST; frames[0].style.opacity='1'; frames[0].style.zIndex='2';
   park(frames[1]);
 
   function navigate(dest, dir){
     if(busy){ pending={dest:dest, dir:dir}; return; }
+    var r=RECIPES[dir]||RECIPES.forward;
     busy=true;
     nowEl.textContent=label(dest);
     var f=frames[front], b=frames[1-front];
-    var enterFrom = dir==='back' ? '-32%' : (dir==='fade' ? '0' : '100%');
+    var started=false;
 
-    b.onload=function(){
+    function play(){
+      if(started) return; started=true;
       b.onload=null;
-      // place incoming at its start pose (no transition)
-      b.style.transition='none';
-      b.style.zIndex='3'; f.style.zIndex='2';
-      if(dir==='fade'){ b.style.opacity='0'; b.style.transform='translate3d(0,0,0) scale(1.03)'; }
-      else { b.style.opacity='1'; b.style.transform='translate3d('+enterFrom+',0,0)'; }
-      scrim.style.transition='none'; scrim.style.opacity='0';
+      // start poses (no transition)
+      b.style.transition='none'; f.style.transition='none'; scrim.style.transition='none';
+      b.style.zIndex = r.topIn ? '3' : '2';
+      f.style.zIndex = r.topIn ? '2' : '3';
+      b.style.transform=r.bFrom; b.style.opacity=String(r.bOp);
+      f.style.transform=REST;    f.style.opacity='1';
+      scrim.style.opacity=String(r.scrimStart);
       void b.offsetWidth; // reflow
 
-      // animate
-      var tr='transform '+DUR+'ms '+EASE+', opacity '+DUR+'ms '+EASE;
-      b.style.transition=tr; f.style.transition=tr; scrim.style.transition='opacity '+DUR+'ms '+EASE;
-      b.style.transform='translate3d(0,0,0) scale(1)'; b.style.opacity='1';
-      if(dir==='back'){ f.style.transform='translate3d(100%,0,0)'; f.style.opacity='1'; scrim.style.opacity='0'; }
-      else if(dir==='fade'){ f.style.opacity='0'; f.style.transform='translate3d(0,0,0) scale(.97)'; }
-      else { f.style.transform='translate3d(-26%,0,0)'; f.style.opacity='1'; scrim.style.opacity='.18'; } // forward: parallax + dim
+      // play
+      var tr='transform '+r.dur+'ms '+r.ease+', opacity '+r.dur+'ms '+r.ease;
+      b.style.transition=tr; f.style.transition=tr; scrim.style.transition='opacity '+r.dur+'ms '+r.ease;
+      b.style.transform=REST; b.style.opacity='1';
+      f.style.transform=r.fTo; f.style.opacity=String(r.fOp);
+      scrim.style.opacity=String(r.scrimEnd);
 
       setTimeout(function(){
         front=1-front;
-        park(f);
-        f.style.zIndex='1';
+        park(f); f.style.zIndex='1';
         scrim.style.transition='none'; scrim.style.opacity='0';
         busy=false;
         if(pending){ var p=pending; pending=null; navigate(p.dest, p.dir); }
-      }, DUR+30);
-    };
+      }, r.dur+30);
+    }
+
+    b.onload=function(){ play(); };
     b.src=dest;
+    // Don't wait on a slow load event — screens are prewarmed in cache, so the
+    // incoming doc is painted within a frame. Kick the animation almost instantly.
+    setTimeout(play, 60);
   }
 
-  function show(dest, dir){ navigate(dest, dir||'forward'); }
-  // A forward step from a screen: record history, then animate in.
-  // Screens reach us via a direct same-origin call OR postMessage — only one path
-  // fires per navigation, so pushing in both never double-counts.
-  function forwardStep(dest){ navStack.push(dest); show(dest, 'forward'); }
-  window.__protoNav=function(dest){ forwardStep(dest); };
-  window.addEventListener('message', function(e){ if(e.data && e.data.__ttdnav){ forwardStep(e.data.__ttdnav); } });
+  // ---- direction inference --------------------------------------------------
+  function requestNav(dest){
+    var cur=navStack[navStack.length-1];
+    var goingBack = navStack.length>=2 && dest===navStack[navStack.length-2];
+    var dir;
+    if(goingBack){ navStack.pop(); dir = SHEET[cur] ? 'down' : 'back'; }
+    else if(SHEET[dest]){ navStack.push(dest); dir='up'; }
+    else { navStack.push(dest); dir='forward'; }
+    navigate(dest, dir);
+  }
+
+  // screens reach us via a direct same-origin call OR postMessage — one fires per nav
+  window.__protoNav=function(dest){ requestNav(dest); };
+  window.addEventListener('message', function(e){ if(e.data && e.data.__ttdnav){ requestNav(e.data.__ttdnav); } });
 
   document.getElementById('restartBtn').onclick=function(){
-    if(busy) return;
+    if(busy){ pending={dest:HOME,dir:'fade'}; }
     try{ sessionStorage.removeItem('ttd_pay_attempt'); }catch(_){}
-    navStack=['01-services-menu.html'];
-    show('01-services-menu.html', 'fade');
+    navStack=[HOME];
+    navigate(HOME, 'fade');
   };
   document.getElementById('backBtn').onclick=function(){
-    if(busy || navStack.length<2) return;
-    navStack.pop();
-    show(navStack[navStack.length-1], 'back');
+    if(navStack.length<2) return;
+    requestNav(navStack[navStack.length-2]); // triggers the 'back'/'down' path
   };
+
+  // Prewarm every screen into the HTTP cache on startup, so later src swaps
+  // resolve from disk instantly instead of hitting the network on each tap.
+  (function(){
+    try{
+      var warmed={};
+      Object.keys(NAMES).forEach(function(u){
+        if(warmed[u]) return; warmed[u]=1;
+        fetch(u, {cache:'force-cache'}).catch(function(){});
+      });
+    }catch(_){}
+  })();
 
   // fit the 360×800 phone into the available space (never upscale past 1×)
   function fit(){
