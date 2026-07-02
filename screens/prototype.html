@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TTD Darshan · Interactive Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;background:#E7E5DF;color:#212121;-webkit-font-smoothing:antialiased}
+  body{display:flex;flex-direction:column;align-items:center}
+  ::-webkit-scrollbar{width:0;height:0}
+  .bar{width:100%;display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid #D8D5CD;background:#EFEDE8;position:sticky;top:0;z-index:10}
+  .logo{width:30px;height:30px;border-radius:8px;background:#4A148C;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+  .title{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .sub{font-size:12px;color:#8A857C}
+  .spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:9px;border:1px solid #C9C4B8;background:#fff;color:#4A148C;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn:hover{background:#F4F0FB}
+  .btn.primary{background:#4A148C;color:#fff;border-color:#4A148C}
+  .btn.primary:hover{background:#5B1FA6}
+  .stagewrap{flex:1;width:100%;display:flex;align-items:center;justify-content:center;padding:28px}
+  iframe{width:375px;height:780px;border:none;border-radius:26px;background:#fff;box-shadow:0 20px 60px rgba(40,20,80,.22)}
+  .now{font-size:12px;color:#8A857C;font-weight:600;padding:4px 10px;border-radius:20px;background:#E3DFF3;color:#4A148C}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="logo">T</div>
+    <div>
+      <div class="title">TTD Special Entry Darshan</div>
+      <div class="sub">Interactive prototype — tap through the flow</div>
+    </div>
+    <span id="now" class="now">01 · Services</span>
+    <div class="spacer"></div>
+    <button class="btn" id="backBtn">‹ Back</button>
+    <button class="btn primary" id="restartBtn">↻ Restart</button>
+  </div>
+  <div class="stagewrap">
+    <iframe id="stage" src="01-services-menu.html" title="prototype screen"></iframe>
+  </div>
+
+<script>
+  var stage=document.getElementById('stage');
+  var nowEl=document.getElementById('now');
+  var navStack=['01-services-menu.html'];
+  var NAMES={
+    '01-services-menu.html':'01 · Services','02-my-pilgrims-empty.html':'02 · My Pilgrims','03-my-pilgrims-list.html':'03 · My Pilgrims',
+    '04-add-pilgrim.html':'04 · Add Pilgrim','05-select-pilgrims.html':'05 · Select Pilgrims','06-add-pilgrim-inflow.html':'06 · Add Pilgrim',
+    'queue.html':'Virtual Queue','slot-availability.html':'Slot Availability','07-confirm-slot-lock.html':'07 · Confirm Slot',
+    '08-payment-hold.html':'08 · Payment','10-upi-redirect.html':'10 · UPI Redirect','12-payment-failed.html':'12 · Payment Failed',
+    '13-booking-confirmed.html':'13 · Confirmed','14-hold-expired-queue-open.html':'14 · Hold Expired','18-remove-pilgrim.html':'Remove Pilgrim',
+    '19-constraint-info.html':'Constraint Info'
+  };
+  function label(dest){ return NAMES[dest] || dest.replace('.html','').replace(/-/g,' '); }
+  function show(dest, pushHist){
+    if(pushHist!==false) navStack.push(dest);
+    stage.src=dest;
+    nowEl.textContent=label(dest);
+  }
+  window.addEventListener('message',function(e){
+    if(e.data && e.data.__ttdnav){ show(e.data.__ttdnav); }
+  });
+  document.getElementById('restartBtn').onclick=function(){
+    try{ sessionStorage.removeItem('ttd_pay_attempt'); }catch(_){}
+    navStack=['01-services-menu.html']; show('01-services-menu.html', false);
+  };
+  document.getElementById('backBtn').onclick=function(){
+    if(navStack.length>1){ navStack.pop(); var prev=navStack[navStack.length-1]; show(prev, false); }
+  };
+</script>
+</body>
+</html>
