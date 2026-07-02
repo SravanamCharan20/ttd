@@ -8,21 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;background:#E7E5DF;color:#212121;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;height:100%;font-family:'Inter',system-ui,sans-serif;background:#E7E5DF;color:#212121;-webkit-font-smoothing:antialiased;overflow:hidden}
   body{display:flex;flex-direction:column;align-items:center}
   ::-webkit-scrollbar{width:0;height:0}
-  .bar{width:100%;display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid #D8D5CD;background:#EFEDE8;position:sticky;top:0;z-index:10}
-  .logo{width:30px;height:30px;border-radius:8px;background:#4A148C;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+  .bar{width:100%;display:flex;align-items:center;gap:14px;padding:12px 22px;border-bottom:1px solid #D8D5CD;background:#EFEDE8;flex-shrink:0;z-index:10}
+  .logo{width:30px;height:30px;border-radius:8px;background:#4A148C;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
   .title{font-size:15px;font-weight:800;letter-spacing:-.01em}
   .sub{font-size:12px;color:#8A857C}
   .spacer{flex:1}
-  .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:9px;border:1px solid #C9C4B8;background:#fff;color:#4A148C;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:9px;border:1px solid #C9C4B8;background:#fff;color:#4A148C;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
   .btn:hover{background:#F4F0FB}
   .btn.primary{background:#4A148C;color:#fff;border-color:#4A148C}
   .btn.primary:hover{background:#5B1FA6}
-  .stagewrap{flex:1;width:100%;display:flex;align-items:center;justify-content:center;padding:28px}
-  iframe{width:375px;height:780px;border:none;border-radius:26px;background:#fff;box-shadow:0 20px 60px rgba(40,20,80,.22)}
-  .now{font-size:12px;color:#8A857C;font-weight:600;padding:4px 10px;border-radius:20px;background:#E3DFF3;color:#4A148C}
+  .now{font-size:12px;color:#4A148C;font-weight:700;padding:5px 12px;border-radius:20px;background:#E3DFF3;white-space:nowrap}
+  .stagewrap{flex:1;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0}
+  .phone{width:360px;height:800px;transform-origin:center center;border-radius:30px;background:#000;box-shadow:0 24px 70px rgba(40,20,80,.28);overflow:hidden;position:relative}
+  .viewport{position:absolute;inset:0;overflow:hidden;background:#fff;border-radius:30px}
+  .viewport iframe{position:absolute;top:0;left:0;width:360px;height:800px;border:none;display:block;background:#fff;will-change:transform,opacity;backface-visibility:hidden}
+  .scrim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;will-change:opacity}
 </style>
 </head>
 <body>
@@ -30,21 +33,34 @@
     <div class="logo">T</div>
     <div>
       <div class="title">TTD Special Entry Darshan</div>
-      <div class="sub">Interactive prototype — tap through the flow</div>
+      <div class="sub">Interactive prototype · 720×1600 @ 0.5× (360×800)</div>
     </div>
     <span id="now" class="now">01 · Services</span>
     <div class="spacer"></div>
     <button class="btn" id="backBtn">‹ Back</button>
     <button class="btn primary" id="restartBtn">↻ Restart</button>
   </div>
-  <div class="stagewrap">
-    <iframe id="stage" src="01-services-menu.html" title="prototype screen"></iframe>
+  <div class="stagewrap" id="stagewrap">
+    <div class="phone" id="phone">
+      <div class="viewport" id="viewport">
+        <iframe id="fa" src="01-services-menu.html" title="prototype screen"></iframe>
+        <iframe id="fb" title="prototype screen"></iframe>
+        <div class="scrim" id="scrim"></div>
+      </div>
+    </div>
   </div>
 
 <script>
-  var stage=document.getElementById('stage');
+  var frames=[document.getElementById('fa'), document.getElementById('fb')];
+  var scrim=document.getElementById('scrim');
+  var phone=document.getElementById('phone');
+  var wrap=document.getElementById('stagewrap');
   var nowEl=document.getElementById('now');
+  var front=0, busy=false, pending=null;
   var navStack=['01-services-menu.html'];
+  var EASE='cubic-bezier(.22,.75,.24,1)';
+  var DUR=460;
+
   var NAMES={
     '01-services-menu.html':'01 · Services','02-my-pilgrims-empty.html':'02 · My Pilgrims','03-my-pilgrims-list.html':'03 · My Pilgrims',
     '04-add-pilgrim.html':'04 · Add Pilgrim','05-select-pilgrims.html':'05 · Select Pilgrims','06-add-pilgrim-inflow.html':'06 · Add Pilgrim',
@@ -54,21 +70,78 @@
     '19-constraint-info.html':'Constraint Info'
   };
   function label(dest){ return NAMES[dest] || dest.replace('.html','').replace(/-/g,' '); }
-  function show(dest, pushHist){
-    if(pushHist!==false) navStack.push(dest);
-    stage.src=dest;
+
+  // park an idle iframe fully off-stage + invisible
+  function park(el){ el.style.transition='none'; el.style.opacity='0'; el.style.transform='translate3d(100%,0,0)'; }
+  // init front
+  frames[0].style.transform='translate3d(0,0,0)'; frames[0].style.opacity='1'; frames[0].style.zIndex='2';
+  park(frames[1]);
+
+  function navigate(dest, dir){
+    if(busy){ pending={dest:dest, dir:dir}; return; }
+    busy=true;
     nowEl.textContent=label(dest);
+    var f=frames[front], b=frames[1-front];
+    var enterFrom = dir==='back' ? '-32%' : (dir==='fade' ? '0' : '100%');
+
+    b.onload=function(){
+      b.onload=null;
+      // place incoming at its start pose (no transition)
+      b.style.transition='none';
+      b.style.zIndex='3'; f.style.zIndex='2';
+      if(dir==='fade'){ b.style.opacity='0'; b.style.transform='translate3d(0,0,0) scale(1.03)'; }
+      else { b.style.opacity='1'; b.style.transform='translate3d('+enterFrom+',0,0)'; }
+      scrim.style.transition='none'; scrim.style.opacity='0';
+      void b.offsetWidth; // reflow
+
+      // animate
+      var tr='transform '+DUR+'ms '+EASE+', opacity '+DUR+'ms '+EASE;
+      b.style.transition=tr; f.style.transition=tr; scrim.style.transition='opacity '+DUR+'ms '+EASE;
+      b.style.transform='translate3d(0,0,0) scale(1)'; b.style.opacity='1';
+      if(dir==='back'){ f.style.transform='translate3d(100%,0,0)'; f.style.opacity='1'; scrim.style.opacity='0'; }
+      else if(dir==='fade'){ f.style.opacity='0'; f.style.transform='translate3d(0,0,0) scale(.97)'; }
+      else { f.style.transform='translate3d(-26%,0,0)'; f.style.opacity='1'; scrim.style.opacity='.18'; } // forward: parallax + dim
+
+      setTimeout(function(){
+        front=1-front;
+        park(f);
+        f.style.zIndex='1';
+        scrim.style.transition='none'; scrim.style.opacity='0';
+        busy=false;
+        if(pending){ var p=pending; pending=null; navigate(p.dest, p.dir); }
+      }, DUR+30);
+    };
+    b.src=dest;
   }
-  window.addEventListener('message',function(e){
-    if(e.data && e.data.__ttdnav){ show(e.data.__ttdnav); }
-  });
+
+  function show(dest, dir){ navigate(dest, dir||'forward'); }
+  // A forward step from a screen: record history, then animate in.
+  // Screens reach us via a direct same-origin call OR postMessage — only one path
+  // fires per navigation, so pushing in both never double-counts.
+  function forwardStep(dest){ navStack.push(dest); show(dest, 'forward'); }
+  window.__protoNav=function(dest){ forwardStep(dest); };
+  window.addEventListener('message', function(e){ if(e.data && e.data.__ttdnav){ forwardStep(e.data.__ttdnav); } });
+
   document.getElementById('restartBtn').onclick=function(){
+    if(busy) return;
     try{ sessionStorage.removeItem('ttd_pay_attempt'); }catch(_){}
-    navStack=['01-services-menu.html']; show('01-services-menu.html', false);
+    navStack=['01-services-menu.html'];
+    show('01-services-menu.html', 'fade');
   };
   document.getElementById('backBtn').onclick=function(){
-    if(navStack.length>1){ navStack.pop(); var prev=navStack[navStack.length-1]; show(prev, false); }
+    if(busy || navStack.length<2) return;
+    navStack.pop();
+    show(navStack[navStack.length-1], 'back');
   };
+
+  // fit the 360×800 phone into the available space (never upscale past 1×)
+  function fit(){
+    var availW=wrap.clientWidth-40, availH=wrap.clientHeight-40;
+    var scale=Math.min(1, availW/360, availH/800);
+    if(!isFinite(scale)||scale<=0) scale=1;
+    phone.style.transform='scale('+scale+')';
+  }
+  window.addEventListener('resize', fit); fit(); setTimeout(fit,60);
 </script>
 </body>
 </html>
